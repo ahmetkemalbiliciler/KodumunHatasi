@@ -11,13 +11,13 @@ const router = Router();
 // All routes require authentication
 router.use(authMiddleware);
 
-// POST /projects/:projectId/versions - Upload new version
-router.post("/projects/:projectId/versions", uploadVersion);
+// POST /api/versions/project/:projectId - Upload new version for a project
+router.post("/project/:projectId", uploadVersion);
 
-// GET /projects/:projectId/versions - List versions for project
-router.get("/projects/:projectId/versions", getVersions);
+// GET /api/versions/project/:projectId - List versions for a project
+router.get("/project/:projectId", getVersions);
 
-// GET /versions/:id - Get version by ID
-router.get("/versions/:id", getVersionById);
+// GET /api/versions/:id - Get version by ID
+router.get("/:id", getVersionById);
 
 export default router;

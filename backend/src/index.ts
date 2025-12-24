@@ -24,12 +24,12 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// Mount routes
-app.use("/auth", authRoutes);
-app.use("/projects", projectRoutes);
-app.use("/api", codeVersionRoutes);
-app.use("/api", analysisRoutes);
-app.use("/api", comparisonRoutes);
+// Mount routes - All under /api prefix for consistency
+app.use("/api/auth", authRoutes);
+app.use("/api/projects", projectRoutes);
+app.use("/api/versions", codeVersionRoutes);
+app.use("/api/analyses", analysisRoutes);
+app.use("/api/comparisons", comparisonRoutes);
 
 // Global error handler
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

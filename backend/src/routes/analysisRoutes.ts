@@ -7,10 +7,10 @@ const router = Router();
 // All routes require authentication
 router.use(authMiddleware);
 
-// POST /versions/:versionId/analyze - Trigger analysis
-router.post("/versions/:versionId/analyze", analyzeVersion);
+// POST /api/analyses/version/:versionId - Trigger analysis for a version
+router.post("/version/:versionId", analyzeVersion);
 
-// GET /versions/:versionId/analysis - Get analysis results
-router.get("/versions/:versionId/analysis", getAnalysis);
+// GET /api/analyses/version/:versionId - Get analysis results for a version
+router.get("/version/:versionId", getAnalysis);
 
 export default router;

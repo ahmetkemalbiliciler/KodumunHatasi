@@ -12,16 +12,16 @@ const router = Router();
 // All routes require authentication
 router.use(authMiddleware);
 
-// POST /projects - Create new project
+// POST /api/projects - Create new project
 router.post("/", createProject);
 
-// GET /projects - List all projects
+// GET /api/projects - List all projects
 router.get("/", getProjects);
 
-// GET /projects/:id - Get project by ID
+// GET /api/projects/:id - Get project by ID
 router.get("/:id", getProjectById);
 
-// DELETE /projects/:id - Delete project
+// DELETE /api/projects/:id - Delete project
 router.delete("/:id", deleteProject);
 
 export default router;
