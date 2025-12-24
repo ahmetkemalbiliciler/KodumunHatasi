@@ -10,27 +10,43 @@
   --color-accent: var(--accent);
   --color-border: var(--border);
 
-  /* Light theme variables */
-  --light-bg-primary: #ffffff;
-  --light-bg-secondary: #f8f9fa;
-  --light-bg-tertiary: #f1f3f5;
-  --light-text-primary: #212529;
-  --light-text-secondary: #6c757d;
-  --light-accent: #007bff;
-  --light-border: #dee2e6;
+  --color-glass: var(--glass-bg);
+  --color-glass-border: var(--glass-border);
 
-  /* Dark theme variables */
-  --dark-bg-primary: #11001c; /* En derin ton - Ana arka plan */
-  --dark-bg-secondary: #290025; /* Bir tık açık - Kartlar ve bölümler */
-  --dark-bg-tertiary: #4f0147; /* Üçüncü ton - Eksik olan renk */
-  --dark-text-primary: #ffffff; /* Birincil yazı - Beyaz */
-  --dark-text-secondary: #a1a1aa; /* İkincil yazı - Gri */
-  --dark-accent: #3a015c; /* Canlı ton - Vurgu rengi */
-  --dark-border: #35012c; /* Ara ton - Kenarlıklar */
+  /* Light theme variables */
+  --light-bg-primary: #fdfdfd;
+  --light-bg-secondary: #ffffff;
+  --light-bg-tertiary: #f3f4f6;
+  --light-text-primary: #111827;
+  --light-text-secondary: #6b7280;
+  --light-accent: #3b82f6;
+  --light-border: #e5e7eb;
+  --light-glass-bg: rgba(255, 255, 255, 0.7);
+  --light-glass-border: rgba(255, 255, 255, 0.5);
+
+  /* Dark theme variables - Modern & Rich (Restored) */
+  --dark-bg-primary: #0f172a;
+  /* Slate 900 */
+  --dark-bg-secondary: #1e293b;
+  /* Slate 800 */
+  --dark-bg-tertiary: #334155;
+  /* Slate 700 */
+  --dark-text-primary: #f8fafc;
+  /* Slate 50 */
+  --dark-text-secondary: #94a3b8;
+  /* Slate 400 */
+  --dark-accent: #8b5cf6;
+  /* Violet 500 */
+  --dark-border: #1e293b;
+  --dark-glass-bg: rgba(30, 41, 59, 0.7);
+  --dark-glass-border: rgba(255, 255, 255, 0.1);
 }
 
 /* Dark theme (default) */
 :root {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+
   --bg-primary: var(--dark-bg-primary);
   --bg-secondary: var(--dark-bg-secondary);
   --bg-tertiary: var(--dark-bg-tertiary);
@@ -38,6 +54,10 @@
   --text-secondary: var(--dark-text-secondary);
   --accent: var(--dark-accent);
   --border: var(--dark-border);
+  --glass-bg: var(--dark-glass-bg);
+  --glass-border: var(--dark-glass-border);
+
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 /* Light theme */
@@ -49,4 +69,67 @@
   --text-secondary: var(--light-text-secondary);
   --accent: var(--light-accent);
   --border: var(--light-border);
+  --glass-bg: var(--light-glass-bg);
+  --glass-border: var(--light-glass-border);
+}
+
+/* Utilities */
+@utility glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+@utility glass-card {
+  @apply glass rounded-2xl shadow-xl;
+}
+
+@utility animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@utility animate-slide-up {
+  animation: slideUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
