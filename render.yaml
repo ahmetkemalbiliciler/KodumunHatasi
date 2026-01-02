@@ -1,5 +1,4 @@
 services:
-  - type: static
     name: kodumunhatasi-frontend
     buildCommand: cd frontend && npm install && npm run build
     publishPath: frontend/dist
