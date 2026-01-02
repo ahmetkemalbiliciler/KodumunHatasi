@@ -89,6 +89,12 @@ export default function Header() {
               {isLoggedIn ? (
                 <>
                   <Button
+                    text="Dashboard"
+                    variant="ghost"
+                    onClick={() => navigate("/dashboard")}
+                    icon={<span className="material-symbols-outlined text-lg">dashboard</span>}
+                  />
+                  <Button
                     text="History"
                     variant="ghost"
                     onClick={() => navigate("/history")}

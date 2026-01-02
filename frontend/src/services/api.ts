@@ -109,3 +109,33 @@ export const comparisons = {
     get: (id: string) => apiCall<any>(`/comparisons/${id}`),
     explain: (id: string) => apiCall<any>(`/comparisons/${id}/explain`, { method: "POST" }),
 };
+
+export const stats = {
+    getOverview: () => apiCall<{
+        totalProjects: number;
+        totalVersions: number;
+        totalIssues: number;
+        totalComparisons: number;
+        issueBreakdown: {
+            improved: number;
+            worsened: number;
+            unchanged: number;
+        };
+    }>("/stats"),
+    getTrends: () => apiCall<{
+        trends: Array<{ date: string; issues: number }>;
+    }>("/stats/trends"),
+    getTopIssues: (limit?: number) => apiCall<{
+        topIssues: Array<{ issueCode: string; count: number }>;
+    }>(`/stats/issues${limit ? `?limit=${limit}` : ""}`),
+    getActivity: (limit?: number) => apiCall<{
+        activities: Array<{
+            type: "analysis" | "comparison";
+            projectName: string;
+            versionLabel?: string;
+            issueCount?: number;
+            resultCount?: number;
+            createdAt: string;
+        }>;
+    }>(`/stats/activity${limit ? `?limit=${limit}` : ""}`),
+};
