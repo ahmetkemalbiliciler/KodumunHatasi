@@ -1,14 +1,51 @@
+import { useState, useEffect } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import { versions } from "../../services/api";
 import type { Version } from "./types";
 import { safeFormatDate } from "./utils";
 
 interface AnalysisViewProps {
-    selectedVersion: Version;
+    versionId: string;
     onBack: () => void;
 }
 
-export default function AnalysisView({ selectedVersion, onBack }: AnalysisViewProps) {
+export default function AnalysisView({ versionId, onBack }: AnalysisViewProps) {
+    const [selectedVersion, setSelectedVersion] = useState<Version | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchVersion = async () => {
+            setIsLoading(true);
+            try {
+                const data = await versions.get(versionId);
+                setSelectedVersion(data);
+            } catch (error) {
+                console.error("Failed to fetch version:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchVersion();
+    }, [versionId]);
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
+            </div>
+        );
+    }
+
+    if (!selectedVersion) {
+        return (
+            <div className="text-center p-10">
+                <p className="text-text-secondary">Version not found.</p>
+                <button onClick={onBack} className="mt-4 text-accent hover:underline">Go Back</button>
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-8 animate-slide-up">
             {/* Mobile Back Button */}

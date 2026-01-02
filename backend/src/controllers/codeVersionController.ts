@@ -99,3 +99,59 @@ export async function getVersionById(
     res.status(500).json({ success: false, error: "Failed to fetch version" });
   }
 }
+
+/**
+ * Delete a code version
+ * DELETE /versions/:id
+ */
+export async function deleteVersion(
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> {
+  try {
+    const id = req.params.id as string;
+
+    const deleted = await codeVersionService.delete(id, req.userId!);
+
+    if (!deleted) {
+      res.status(404).json({ success: false, error: "Version not found" });
+      return;
+    }
+
+    res.json({ success: true, data: { message: "Version deleted successfully" } });
+  } catch (error) {
+    console.error("Error deleting version:", error);
+    res.status(500).json({ success: false, error: "Failed to delete version" });
+  }
+}
+
+/**
+ * Rename a code version (update versionLabel)
+ * PATCH /versions/:id
+ */
+export async function renameVersion(
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> {
+  try {
+    const id = req.params.id as string;
+    const { versionLabel } = req.body as { versionLabel: string };
+
+    if (!versionLabel) {
+      res.status(400).json({ success: false, error: "versionLabel is required" });
+      return;
+    }
+
+    const updated = await codeVersionService.rename(id, req.userId!, versionLabel);
+
+    if (!updated) {
+      res.status(404).json({ success: false, error: "Version not found" });
+      return;
+    }
+
+    res.json({ success: true, data: updated });
+  } catch (error) {
+    console.error("Error renaming version:", error);
+    res.status(500).json({ success: false, error: "Failed to rename version" });
+  }
+}

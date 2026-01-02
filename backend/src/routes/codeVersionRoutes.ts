@@ -2,7 +2,9 @@ import { Router } from "express";
 import { 
   uploadVersion, 
   getVersions, 
-  getVersionById 
+  getVersionById,
+  deleteVersion,
+  renameVersion
 } from "../controllers/codeVersionController.js";
 import { authMiddleware } from "../middleware/auth.js";
 
@@ -19,5 +21,11 @@ router.get("/project/:projectId", getVersions);
 
 // GET /api/versions/:id - Get version by ID
 router.get("/:id", getVersionById);
+
+// DELETE /api/versions/:id - Delete a version
+router.delete("/:id", deleteVersion);
+
+// PATCH /api/versions/:id - Rename a version
+router.patch("/:id", renameVersion);
 
 export default router;

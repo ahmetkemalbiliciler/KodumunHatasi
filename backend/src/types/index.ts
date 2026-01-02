@@ -12,7 +12,36 @@ export interface AIAnalysisResponse {
 }
 
 export interface AIIssue {
-  issueCode: "NESTED_LOOP" | "UNUSED_VARIABLE" | "MAGIC_NUMBER" | "LONG_FUNCTION" | "DUPLICATE_CODE";
+  issueCode: 
+    // Performance Issues
+    | "NESTED_LOOP" 
+    | "INEFFICIENT_ALGORITHM" 
+    | "MEMORY_LEAK" 
+    | "N_PLUS_ONE_QUERY" 
+    | "BLOCKING_OPERATION"
+    // Code Quality Issues
+    | "UNUSED_VARIABLE" 
+    | "MAGIC_NUMBER" 
+    | "LONG_FUNCTION" 
+    | "DUPLICATE_CODE" 
+    | "DEAD_CODE" 
+    | "COMPLEX_CONDITION" 
+    | "DEEP_NESTING"
+    // Security Issues
+    | "HARDCODED_SECRET" 
+    | "SQL_INJECTION" 
+    | "XSS_VULNERABILITY" 
+    | "INSECURE_RANDOM"
+    // Error Handling
+    | "EMPTY_CATCH" 
+    | "MISSING_ERROR_HANDLING" 
+    | "SWALLOWED_EXCEPTION"
+    // Best Practices
+    | "MISSING_NULL_CHECK" 
+    | "MISSING_TYPE_ANNOTATION" 
+    | "INCONSISTENT_NAMING" 
+    | "GOD_FUNCTION" 
+    | "MISSING_RETURN_TYPE";
   severity: "low" | "medium" | "high";
   complexity: "O_1" | "O_n" | "O_n2";
   functionName?: string;

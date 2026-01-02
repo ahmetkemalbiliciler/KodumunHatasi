@@ -1,100 +1,137 @@
 import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { projects, versions, comparisons } from "../services/api";
 import Sidebar from "../components/History/Sidebar";
 import ComparisonView from "../components/History/ComparisonView";
 import AnalysisView from "../components/History/AnalysisView";
 import EmptyState from "../components/History/EmptyState";
 import type { Project, Version, Comparison } from "../components/History/types";
+import { toast } from "react-toastify";
 
 export default function History() {
+    const { projectId, type, id } = useParams();
+    const navigate = useNavigate();
+
     const [projectList, setProjectList] = useState<Project[]>([]);
-    const [selectedProjectId, setSelectedProjectId] = useState<string>("");
     const [versionList, setVersionList] = useState<Version[]>([]);
-    const [selectedVersion, setSelectedVersion] = useState<Version | null>(null);
+    const [comparisonList, setComparisonList] = useState<Comparison[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [activeTab, setActiveTab] = useState<"versions" | "comparisons">("versions");
 
     // Comparison State
     const [isCompareMode, setIsCompareMode] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false);
     const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
     const [isComparing, setIsComparing] = useState(false);
-    const [comparisonData, setComparisonData] = useState<Comparison | null>(null);
-    const [isExplaining, setIsExplaining] = useState(false);
 
     // Fetch Projects
     useEffect(() => {
         projects.list().then((data) => {
             setProjectList(data);
-            if (data.length > 0) {
-                setSelectedProjectId(data[0].id);
+            if (data.length > 0 && !projectId) {
+                navigate(`/history/${data[0].id}`, { replace: true });
             }
         }).catch(console.error);
-    }, []);
+    }, [projectId, navigate]);
 
-    // Fetch Versions when Project changes
+    // Fetch Versions and Comparisons when Project changes
     useEffect(() => {
-        if (!selectedProjectId) return;
+        if (!projectId) return;
 
         setIsLoading(true);
-        // Reset states
-        setSelectedVersion(null);
-        setComparisonData(null);
-        setIsCompareMode(false);
-        setSelectedForCompare([]);
-
-        versions.list(selectedProjectId).then(async (data) => {
-            const sorted = data.sort((a: any, b: any) =>
+        
+        Promise.all([
+            versions.list(projectId),
+            comparisons.list(projectId)
+        ]).then(([vData, cData]) => {
+            const sortedVersions = vData.sort((a: any, b: any) =>
                 new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
             );
-            setVersionList(sorted);
+            setVersionList(sortedVersions);
+
+            const sortedComparisons = cData.sort((a: any, b: any) =>
+                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+            setComparisonList(sortedComparisons);
         }).catch(console.error).finally(() => setIsLoading(false));
-    }, [selectedProjectId]);
+    }, [projectId]);
+
+    // Update active tab based on URL type
+    useEffect(() => {
+        if (type === "version") {
+            setActiveTab("versions");
+        } else if (type === "comparison") {
+            setActiveTab("comparisons");
+        }
+    }, [type]);
 
     const handleVersionSelect = async (version: Version) => {
         if (isCompareMode) {
-            // Toggle selection for comparison
             if (selectedForCompare.includes(version.id)) {
                 setSelectedForCompare(prev => prev.filter(id => id !== version.id));
             } else {
                 if (selectedForCompare.length < 2) {
                     setSelectedForCompare(prev => [...prev, version.id]);
                 } else {
-                    // Replace the oldest selection or just alert?
-                    // Let's just prevent > 2
-                    alert("You can only compare 2 versions at a time.");
+                    toast.warn("You can only compare 2 versions at a time.");
                 }
             }
             return;
         }
 
-        // Normal view mode
-        setComparisonData(null);
-        setIsLoading(true);
-        try {
-            const fullVersion = await versions.get(version.id);
-            setSelectedVersion(fullVersion);
-        } catch (e) {
-            console.error(e);
-            // Fallback to local version if fetch fails
-            setSelectedVersion(version);
-        } finally {
-            setIsLoading(false);
-        }
+        navigate(`/history/${projectId}/version/${version.id}`);
+    };
+
+    const handleComparisonSelect = async (comparison: Comparison) => {
+        navigate(`/history/${projectId}/comparison/${comparison.id}`);
     };
 
     const toggleCompareMode = () => {
         setIsCompareMode(!isCompareMode);
+        setIsEditMode(false);
         setSelectedForCompare([]);
-        setComparisonData(null);
         if (!isCompareMode) {
-            setSelectedVersion(null);
+            navigate(`/history/${projectId}`);
+        }
+    };
+
+    const toggleEditMode = () => {
+        setIsEditMode(!isEditMode);
+        setIsCompareMode(false);
+        setSelectedForCompare([]);
+        navigate(`/history/${projectId}`);
+    };
+
+    const handleVersionDelete = async (versionId: string) => {
+        if (!window.confirm("Are you sure you want to delete this version?")) return;
+        try {
+            await versions.delete(versionId);
+            setVersionList(prev => prev.filter(v => v.id !== versionId));
+            if (id === versionId) {
+                navigate(`/history/${projectId}`);
+            }
+            toast.success("Version deleted successfully");
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to delete version");
+        }
+    };
+
+    const handleVersionUpdate = async (versionId: string, newLabel: string) => {
+        try {
+            await versions.update(versionId, { versionLabel: newLabel });
+            setVersionList(prev => prev.map(v => v.id === versionId ? { ...v, versionLabel: newLabel } : v));
+            toast.success("Version updated successfully");
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to update version");
         }
     };
 
     const handleCompare = async () => {
-        if (selectedForCompare.length !== 2) return;
+        if (selectedForCompare.length !== 2 || !projectId) return;
 
         setIsComparing(true);
-        // Sort: Older first (from), Newer second (to)
         const v1 = versionList.find(v => v.id === selectedForCompare[0]);
         const v2 = versionList.find(v => v.id === selectedForCompare[1]);
 
@@ -107,41 +144,38 @@ export default function History() {
         const toVersionId = date1 < date2 ? v2.id : v1.id;
 
         try {
-            const result = await comparisons.create(selectedProjectId, {
+            const result = await comparisons.create(projectId, {
                 fromVersionId,
                 toVersionId
             });
-            setComparisonData(result);
+            setComparisonList(prev => [result, ...prev]);
+            setIsCompareMode(false);
+            navigate(`/history/${projectId}/comparison/${result.id}`);
         } catch (error) {
             console.error(error);
-            alert("Comparison failed. Ensure both versions have been analyzed.");
+            toast.error("Comparison failed. Ensure both versions have been analyzed.");
         } finally {
             setIsComparing(false);
         }
     };
 
-    const handleGenerateExplanation = async () => {
-        if (!comparisonData) return;
-        setIsExplaining(true);
-        try {
-            const explanation = await comparisons.explain(comparisonData.id);
-            setComparisonData(prev => prev ? { ...prev, explanation } : null);
-        } catch (error) {
-            console.error(error);
-            alert("Failed to generate explanation.");
-        } finally {
-            setIsExplaining(false);
-        }
-    };
-
     const handleBackToNavigator = () => {
-        setSelectedVersion(null);
-        setComparisonData(null);
+        navigate(`/history/${projectId}`);
     };
 
-    // Helper to get version label by ID
+    const handleProjectChange = (newProjectId: string) => {
+        navigate(`/history/${newProjectId}`);
+    };
+
+    // Helper to get version label by ID or Analysis ID
     const getVersionLabel = (id: string) => {
-        return versionList.find(v => v.id === id)?.versionLabel || "Unknown";
+        const byVersionId = versionList.find(v => v.id === id);
+        if (byVersionId) return byVersionId.versionLabel;
+
+        const byAnalysisId = versionList.find(v => v.analysis?.id === id);
+        if (byAnalysisId) return byAnalysisId.versionLabel;
+
+        return "Unknown";
     };
 
     return (
@@ -153,13 +187,22 @@ export default function History() {
             {/* Sidebar - Navigator */}
             <Sidebar
                 projectList={projectList}
-                selectedProjectId={selectedProjectId}
-                onProjectChange={setSelectedProjectId}
+                selectedProjectId={projectId || ""}
+                onProjectChange={handleProjectChange}
                 versionList={versionList}
-                selectedVersion={selectedVersion}
+                comparisonList={comparisonList}
+                selectedId={id || null}
+                selectedType={(type as any) || null}
                 onVersionSelect={handleVersionSelect}
+                onComparisonSelect={handleComparisonSelect}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
                 isCompareMode={isCompareMode}
                 onToggleCompareMode={toggleCompareMode}
+                isEditMode={isEditMode}
+                onToggleEditMode={toggleEditMode}
+                onVersionDelete={handleVersionDelete}
+                onVersionUpdate={handleVersionUpdate}
                 selectedForCompare={selectedForCompare}
                 onCompare={handleCompare}
                 isComparing={isComparing}
@@ -171,22 +214,19 @@ export default function History() {
                 className={`
           flex-1 overflow-y-auto bg-bg-primary/50 relative
           transition-all duration-500 ease-in-out
-          ${(selectedVersion || comparisonData) ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10 pointer-events-none md:opacity-100 md:translate-x-0 md:pointer-events-auto'}
+          ${id ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10 pointer-events-none md:opacity-100 md:translate-x-0 md:pointer-events-auto'}
         `}
             >
                 <div className="p-6 md:p-10 max-w-5xl mx-auto pb-24">
-                    {comparisonData ? (
+                    {type === "comparison" && id ? (
                         <ComparisonView
-                            comparisonData={comparisonData}
-                            selectedForCompare={selectedForCompare}
+                            comparisonId={id}
                             getVersionLabel={getVersionLabel}
                             onBack={handleBackToNavigator}
-                            onGenerateExplanation={handleGenerateExplanation}
-                            isExplaining={isExplaining}
                         />
-                    ) : (selectedVersion && selectedVersion.analysis) ? (
+                    ) : type === "version" && id ? (
                         <AnalysisView
-                            selectedVersion={selectedVersion}
+                            versionId={id}
                             onBack={handleBackToNavigator}
                         />
                     ) : (

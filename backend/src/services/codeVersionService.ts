@@ -65,4 +65,44 @@ export const codeVersionService = {
 
     return version && version.project.ownerId === ownerId ? version : null;
   },
+
+  /**
+   * Delete a code version (with ownership check)
+   */
+  async delete(versionId: string, ownerId: string) {
+    // Verify ownership first
+    const version = await prisma.codeVersion.findUnique({
+      where: { id: versionId },
+      include: { project: true },
+    });
+
+    if (!version || version.project.ownerId !== ownerId) {
+      return null;
+    }
+
+    // Delete cascade is handled by Prisma relations
+    return prisma.codeVersion.delete({
+      where: { id: versionId },
+    });
+  },
+
+  /**
+   * Rename a code version (update versionLabel)
+   */
+  async rename(versionId: string, ownerId: string, newLabel: string) {
+    // Verify ownership first
+    const version = await prisma.codeVersion.findUnique({
+      where: { id: versionId },
+      include: { project: true },
+    });
+
+    if (!version || version.project.ownerId !== ownerId) {
+      return null;
+    }
+
+    return prisma.codeVersion.update({
+      where: { id: versionId },
+      data: { versionLabel: newLabel },
+    });
+  },
 };

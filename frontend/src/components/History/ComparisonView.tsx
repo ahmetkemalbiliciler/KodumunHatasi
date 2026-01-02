@@ -1,26 +1,75 @@
+import { useState, useEffect } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { comparisons } from "../../services/api";
 import type { Comparison } from "./types";
+import { toast } from "react-toastify";
 
 interface ComparisonViewProps {
-    comparisonData: Comparison;
-    selectedForCompare: string[];
+    comparisonId: string;
     getVersionLabel: (id: string) => string;
     onBack: () => void;
-    onGenerateExplanation: () => void;
-    isExplaining: boolean;
 }
 
 export default function ComparisonView({
-    comparisonData,
-    selectedForCompare,
+    comparisonId,
     getVersionLabel,
-    onBack,
-    onGenerateExplanation,
-    isExplaining
+    onBack
 }: ComparisonViewProps) {
+    const [comparisonData, setComparisonData] = useState<Comparison | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isExplaining, setIsExplaining] = useState(false);
+
+    useEffect(() => {
+        const fetchComparison = async () => {
+            setIsLoading(true);
+            try {
+                const data = await comparisons.get(comparisonId);
+                setComparisonData(data);
+            } catch (error) {
+                console.error("Failed to fetch comparison:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchComparison();
+    }, [comparisonId]);
+
+    const handleGenerateExplanation = async () => {
+        if (!comparisonData) return;
+        setIsExplaining(true);
+        try {
+            const explanation = await comparisons.explain(comparisonData.id);
+            setComparisonData(prev => prev ? { ...prev, explanation } : null);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to generate explanation.");
+        } finally {
+            setIsExplaining(false);
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
+            </div>
+        );
+    }
+
+    if (!comparisonData) {
+        return (
+            <div className="text-center p-10">
+                <p className="text-text-secondary">Comparison not found.</p>
+                <button onClick={onBack} className="mt-4 text-accent hover:underline">Go Back</button>
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-8 animate-slide-up">
             {/* Mobile Back Button */}
@@ -44,9 +93,9 @@ export default function ComparisonView({
                     Analysis Comparison
                 </h1>
                 <div className="flex items-center gap-3 text-sm mt-3 bg-bg-tertiary/30 w-fit px-4 py-2 rounded-full border border-white/5">
-                    <span className="text-text-primary font-medium">{getVersionLabel(comparisonData.results[0]?.id || selectedForCompare[0])}</span>
+                    <span className="text-text-primary font-medium">{getVersionLabel(comparisonData.fromAnalysisId)}</span>
                     <ArrowForwardIosIcon style={{ fontSize: 10 }} className="text-text-secondary" />
-                    <span className="text-text-primary font-medium">{getVersionLabel(comparisonData.results.length > 0 ? (selectedForCompare.find(id => id !== comparisonData?.results[0]?.id) || selectedForCompare[1]) : selectedForCompare[1])}</span>
+                    <span className="text-text-primary font-medium">{getVersionLabel(comparisonData.toAnalysisId)}</span>
                 </div>
             </header>
 
@@ -61,7 +110,7 @@ export default function ComparisonView({
                     </h3>
                     {!comparisonData.explanation && (
                         <button
-                            onClick={onGenerateExplanation}
+                            onClick={handleGenerateExplanation}
                             disabled={isExplaining}
                             className="text-sm bg-accent hover:bg-accent/90 text-white px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-accent/20 disabled:opacity-50 font-semibold"
                         >
@@ -71,10 +120,10 @@ export default function ComparisonView({
                 </div>
 
                 {comparisonData.explanation ? (
-                    <div className="prose prose-invert max-w-none animate-fade-in">
-                        <p className="text-text-primary/90 leading-relaxed whitespace-pre-wrap text-base">
+                    <div className="prose prose-invert max-w-none animate-fade-in prose-p:text-text-primary/90 prose-p:leading-relaxed prose-headings:text-text-primary prose-li:text-text-primary/90">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
                             {comparisonData.explanation.explanation}
-                        </p>
+                        </ReactMarkdown>
                     </div>
                 ) : (
                     <div className="text-center py-8 text-text-secondary/70">

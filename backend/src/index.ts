@@ -11,6 +11,7 @@ import projectRoutes from "./routes/projectRoutes.js";
 import codeVersionRoutes from "./routes/codeVersionRoutes.js";
 import analysisRoutes from "./routes/analysisRoutes.js";
 import comparisonRoutes from "./routes/comparisonRoutes.js";
+import statsRoutes from "./routes/statsRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,6 +31,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/versions", codeVersionRoutes);
 app.use("/api/analyses", analysisRoutes);
 app.use("/api/comparisons", comparisonRoutes);
+app.use("/api/stats", statsRoutes);
 
 // Global error handler
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
