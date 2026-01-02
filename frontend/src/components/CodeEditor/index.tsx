@@ -44,8 +44,10 @@ export default function CodeEditor() {
   };
 
   const handleCreateProject = () => {
+    setIsLoading(true)
     setNewProjectName("");
     setIsCreateProjectModalOpen(true);
+    setIsLoading(false);
   };
 
   const submitCreateProject = async () => {
