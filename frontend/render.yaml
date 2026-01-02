@@ -1,0 +1,7 @@
+services:
+  - type: static
+    name: kodumunhatasi-frontend
+    env: static
+    routes:
+      - source: /*
+        destination: /index.html
