@@ -1,7 +1,8 @@
 services:
   - type: static
     name: kodumunhatasi-frontend
-    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
     routes:
       - source: /*
         destination: /index.html
