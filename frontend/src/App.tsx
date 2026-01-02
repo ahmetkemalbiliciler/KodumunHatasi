@@ -20,9 +20,13 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/history" element={<History />} />
+            <Route path="/history" element={<History />}>
+              <Route path=":projectId" element={<History />} />
+              <Route path=":projectId/:type/:id" element={<History />} />
+            </Route>
           </Route>
         </Route>
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
