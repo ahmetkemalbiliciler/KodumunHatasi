@@ -9,6 +9,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Wrapper from "./common/Wrapper";
 import Logo from "./Logo";
+import Footer from "./Footer";
 import { auth } from "../services/api";
 import { toast } from "react-toastify";
 
@@ -213,6 +214,9 @@ export default function Header() {
       <main className="pt-20 min-h-screen bg-bg-primary">
         <Outlet />
       </main>
+
+      {/* Hide footer on History page */}
+      {!location.pathname.startsWith("/history") && <Footer />}
     </>
   );
 }
