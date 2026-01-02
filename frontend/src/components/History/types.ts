@@ -48,6 +48,8 @@ export interface AIExplanation {
 export interface Comparison {
     id: string;
     createdAt: string;
+    fromAnalysisId: string;
+    toAnalysisId: string;
     results: ComparisonResultItem[];
     explanation?: AIExplanation;
 }

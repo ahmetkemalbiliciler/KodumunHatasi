@@ -11,8 +11,10 @@ export default function History() {
     const [projectList, setProjectList] = useState<Project[]>([]);
     const [selectedProjectId, setSelectedProjectId] = useState<string>("");
     const [versionList, setVersionList] = useState<Version[]>([]);
+    const [comparisonList, setComparisonList] = useState<Comparison[]>([]);
     const [selectedVersion, setSelectedVersion] = useState<Version | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [activeTab, setActiveTab] = useState<"versions" | "comparisons">("versions");
 
     // Comparison State
     const [isCompareMode, setIsCompareMode] = useState(false);
@@ -32,7 +34,7 @@ export default function History() {
         }).catch(console.error);
     }, []);
 
-    // Fetch Versions when Project changes
+    // Fetch Versions and Comparisons when Project changes
     useEffect(() => {
         if (!selectedProjectId) return;
 
@@ -43,11 +45,19 @@ export default function History() {
         setIsCompareMode(false);
         setSelectedForCompare([]);
 
-        versions.list(selectedProjectId).then(async (data) => {
-            const sorted = data.sort((a: any, b: any) =>
+        Promise.all([
+            versions.list(selectedProjectId),
+            comparisons.list(selectedProjectId)
+        ]).then(([vData, cData]) => {
+            const sortedVersions = vData.sort((a: any, b: any) =>
                 new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
             );
-            setVersionList(sorted);
+            setVersionList(sortedVersions);
+
+            const sortedComparisons = cData.sort((a: any, b: any) =>
+                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+            setComparisonList(sortedComparisons);
         }).catch(console.error).finally(() => setIsLoading(false));
     }, [selectedProjectId]);
 
@@ -78,6 +88,20 @@ export default function History() {
             console.error(e);
             // Fallback to local version if fetch fails
             setSelectedVersion(version);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleComparisonSelect = async (comparison: Comparison) => {
+        setSelectedVersion(null);
+        setIsLoading(true);
+        try {
+            const fullComparison = await comparisons.get(comparison.id);
+            setComparisonData(fullComparison);
+        } catch (e) {
+            console.error(e);
+            setComparisonData(comparison);
         } finally {
             setIsLoading(false);
         }
@@ -149,6 +173,9 @@ export default function History() {
                 toVersionId
             });
             setComparisonData(result);
+            setComparisonList(prev => [result, ...prev]);
+            setIsCompareMode(false);
+            setActiveTab("comparisons");
         } catch (error) {
             console.error(error);
             toast.error("Comparison failed. Ensure both versions have been analyzed.");
@@ -176,9 +203,15 @@ export default function History() {
         setComparisonData(null);
     };
 
-    // Helper to get version label by ID
+    // Helper to get version label by ID or Analysis ID
     const getVersionLabel = (id: string) => {
-        return versionList.find(v => v.id === id)?.versionLabel || "Unknown";
+        const byVersionId = versionList.find(v => v.id === id);
+        if (byVersionId) return byVersionId.versionLabel;
+
+        const byAnalysisId = versionList.find(v => v.analysis?.id === id);
+        if (byAnalysisId) return byAnalysisId.versionLabel;
+
+        return "Unknown";
     };
 
     return (
@@ -193,8 +226,13 @@ export default function History() {
                 selectedProjectId={selectedProjectId}
                 onProjectChange={setSelectedProjectId}
                 versionList={versionList}
+                comparisonList={comparisonList}
                 selectedVersion={selectedVersion}
+                selectedComparison={comparisonData}
                 onVersionSelect={handleVersionSelect}
+                onComparisonSelect={handleComparisonSelect}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
                 isCompareMode={isCompareMode}
                 onToggleCompareMode={toggleCompareMode}
                 isEditMode={isEditMode}
@@ -219,7 +257,6 @@ export default function History() {
                     {comparisonData ? (
                         <ComparisonView
                             comparisonData={comparisonData}
-                            selectedForCompare={selectedForCompare}
                             getVersionLabel={getVersionLabel}
                             onBack={handleBackToNavigator}
                             onGenerateExplanation={handleGenerateExplanation}

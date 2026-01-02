@@ -105,6 +105,7 @@ export const comparisons = {
             method: "POST",
             body: JSON.stringify(data),
         }),
+    list: (projectId: string) => apiCall<any[]>(`/comparisons/project/${projectId}`),
     get: (id: string) => apiCall<any>(`/comparisons/${id}`),
     explain: (id: string) => apiCall<any>(`/comparisons/${id}/explain`, { method: "POST" }),
 };

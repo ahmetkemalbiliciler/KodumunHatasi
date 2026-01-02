@@ -6,7 +6,6 @@ import type { Comparison } from "./types";
 
 interface ComparisonViewProps {
     comparisonData: Comparison;
-    selectedForCompare: string[];
     getVersionLabel: (id: string) => string;
     onBack: () => void;
     onGenerateExplanation: () => void;
@@ -15,7 +14,6 @@ interface ComparisonViewProps {
 
 export default function ComparisonView({
     comparisonData,
-    selectedForCompare,
     getVersionLabel,
     onBack,
     onGenerateExplanation,
@@ -44,9 +42,9 @@ export default function ComparisonView({
                     Analysis Comparison
                 </h1>
                 <div className="flex items-center gap-3 text-sm mt-3 bg-bg-tertiary/30 w-fit px-4 py-2 rounded-full border border-white/5">
-                    <span className="text-text-primary font-medium">{getVersionLabel(comparisonData.results[0]?.id || selectedForCompare[0])}</span>
+                    <span className="text-text-primary font-medium">{getVersionLabel(comparisonData.fromAnalysisId)}</span>
                     <ArrowForwardIosIcon style={{ fontSize: 10 }} className="text-text-secondary" />
-                    <span className="text-text-primary font-medium">{getVersionLabel(comparisonData.results.length > 0 ? (selectedForCompare.find(id => id !== comparisonData?.results[0]?.id) || selectedForCompare[1]) : selectedForCompare[1])}</span>
+                    <span className="text-text-primary font-medium">{getVersionLabel(comparisonData.toAnalysisId)}</span>
                 </div>
             </header>
 
