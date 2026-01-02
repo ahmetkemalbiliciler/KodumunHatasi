@@ -109,9 +109,9 @@ export default function Dashboard() {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 60) return `${diffMins} dakika önce`;
-    if (diffHours < 24) return `${diffHours} saat önce`;
-    return `${diffDays} gün önce`;
+    if (diffMins < 60) return `${diffMins} minutes ago`;
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    return `${diffDays} days ago`;
   };
 
   const getMaxIssueCount = () => {
@@ -124,7 +124,7 @@ export default function Dashboard() {
       <div className="min-h-screen bg-bg-primary flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin" />
-          <p className="text-text-secondary">Dashboard yükleniyor...</p>
+          <p className="text-text-secondary">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -141,32 +141,32 @@ export default function Dashboard() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-text-primary mb-2">Dashboard</h1>
-            <p className="text-text-secondary">Kod analiz istatistiklerinize genel bakış</p>
+            <p className="text-text-secondary">Overview of your code analysis statistics</p>
           </div>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <StatCard
               icon="folder_open"
-              label="Projeler"
+              label="Projects"
               value={overview?.totalProjects ?? 0}
               color="accent"
             />
             <StatCard
               icon="history"
-              label="Versiyonlar"
+              label="Versions"
               value={overview?.totalVersions ?? 0}
               color="blue"
             />
             <StatCard
               icon="bug_report"
-              label="Toplam Issue"
+              label="Total Issues"
               value={overview?.totalIssues ?? 0}
               color="orange"
             />
             <StatCard
               icon="compare_arrows"
-              label="Karşılaştırmalar"
+              label="Comparisons"
               value={overview?.totalComparisons ?? 0}
               color="green"
             />
@@ -177,20 +177,20 @@ export default function Dashboard() {
             <div className="glass-card p-6 mb-8">
               <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
                 <span className="material-symbols-outlined text-accent">analytics</span>
-                Karşılaştırma Sonuçları
+                Comparison Results
               </h2>
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center p-4 rounded-xl bg-green-500/10 border border-green-500/20">
                   <p className="text-3xl font-bold text-green-400">{overview.issueBreakdown.improved}</p>
-                  <p className="text-sm text-text-secondary mt-1">İyileşen</p>
+                  <p className="text-sm text-text-secondary mt-1">Improved</p>
                 </div>
                 <div className="text-center p-4 rounded-xl bg-red-500/10 border border-red-500/20">
                   <p className="text-3xl font-bold text-red-400">{overview.issueBreakdown.worsened}</p>
-                  <p className="text-sm text-text-secondary mt-1">Kötüleşen</p>
+                  <p className="text-sm text-text-secondary mt-1">Worsened</p>
                 </div>
                 <div className="text-center p-4 rounded-xl bg-gray-500/10 border border-gray-500/20">
                   <p className="text-3xl font-bold text-gray-400">{overview.issueBreakdown.unchanged}</p>
-                  <p className="text-sm text-text-secondary mt-1">Değişmeyen</p>
+                  <p className="text-sm text-text-secondary mt-1">Unchanged</p>
                 </div>
               </div>
             </div>
@@ -203,7 +203,7 @@ export default function Dashboard() {
               <div className="glass-card p-6">
                 <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
                   <span className="material-symbols-outlined text-accent">trending_up</span>
-                  Son 7 Günlük Issue Trendi
+                  Last 7 Days Issue Trend
                 </h2>
                 {trends.length > 0 ? (
                   <div className="flex items-end gap-2 h-40">
@@ -226,7 +226,7 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <div className="h-32 flex items-center justify-center text-text-secondary">
-                    <p>Henüz trend verisi yok</p>
+                    <p>No trend data yet</p>
                   </div>
                 )}
               </div>
@@ -235,7 +235,7 @@ export default function Dashboard() {
               <div className="glass-card p-6">
                 <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
                   <span className="material-symbols-outlined text-orange-400">priority_high</span>
-                  En Sık Karşılaşılan Hatalar
+                  Most Common Issues
                 </h2>
                 {topIssues.length > 0 ? (
                   <div className="space-y-3">
@@ -263,7 +263,7 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <div className="py-8 text-center text-text-secondary">
-                    <p>Henüz issue verisi yok</p>
+                    <p>No issue data yet</p>
                   </div>
                 )}
               </div>
@@ -273,7 +273,7 @@ export default function Dashboard() {
             <div className="glass-card p-6">
               <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
                 <span className="material-symbols-outlined text-blue-400">schedule</span>
-                Son Aktiviteler
+                Recent Activity
               </h2>
               {activities.length > 0 ? (
                 <div className="space-y-3">
@@ -302,9 +302,9 @@ export default function Dashboard() {
                         </p>
                         <p className="text-xs text-text-secondary">
                           {activity.type === "analysis" ? (
-                            <>Analiz yapıldı • {activity.issueCount ?? 0} issue tespit edildi</>
+                            <>Analysis completed • {activity.issueCount ?? 0} issues detected</>
                           ) : (
-                            <>Karşılaştırma yapıldı • {activity.resultCount ?? 0} sonuç</>
+                            <>Comparison completed • {activity.resultCount ?? 0} results</>
                           )}
                         </p>
                       </div>
@@ -317,8 +317,8 @@ export default function Dashboard() {
               ) : (
                 <div className="py-12 text-center text-text-secondary">
                   <span className="material-symbols-outlined text-4xl mb-2 opacity-50">inbox</span>
-                  <p>Henüz aktivite yok</p>
-                  <p className="text-xs mt-1">Kod analizi yaparak başlayın</p>
+                  <p>No activity yet</p>
+                  <p className="text-xs mt-1">Start by analyzing some code</p>
                 </div>
               )}
             </div>
