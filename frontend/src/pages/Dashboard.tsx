@@ -137,15 +137,15 @@ export default function Dashboard() {
       <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />
 
       <Wrapper>
-        <div className="py-8">
+        <div className="py-4 md:py-8 px-2 md:px-0">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-text-primary mb-2">Dashboard</h1>
-            <p className="text-text-secondary">Overview of your code analysis statistics</p>
+          <div className="mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-2">Dashboard</h1>
+            <p className="text-sm md:text-base text-text-secondary">Overview of your code analysis statistics</p>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-6 md:mb-8">
             <StatCard
               icon="folder_open"
               label="Projects"
@@ -160,7 +160,7 @@ export default function Dashboard() {
             />
             <StatCard
               icon="bug_report"
-              label="Total Issues"
+              label="Issues"
               value={overview?.totalIssues ?? 0}
               color="orange"
             />
@@ -174,36 +174,37 @@ export default function Dashboard() {
 
           {/* Improvement Breakdown */}
           {overview && (overview.issueBreakdown.improved > 0 || overview.issueBreakdown.worsened > 0 || overview.issueBreakdown.unchanged > 0) && (
-            <div className="glass-card p-6 mb-8">
-              <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-accent">analytics</span>
+            <div className="glass-card p-4 md:p-6 mb-6 md:mb-8">
+              <h2 className="text-base md:text-lg font-semibold text-text-primary mb-3 md:mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-accent text-lg md:text-xl">analytics</span>
                 Comparison Results
               </h2>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-4 rounded-xl bg-green-500/10 border border-green-500/20">
-                  <p className="text-3xl font-bold text-green-400">{overview.issueBreakdown.improved}</p>
-                  <p className="text-sm text-text-secondary mt-1">Improved</p>
+              <div className="grid grid-cols-3 gap-2 md:gap-4">
+                <div className="text-center p-2 md:p-4 rounded-xl bg-green-500/10 border border-green-500/20">
+                  <p className="text-xl md:text-3xl font-bold text-green-400">{overview.issueBreakdown.improved}</p>
+                  <p className="text-xs md:text-sm text-text-secondary mt-1">Improved</p>
                 </div>
-                <div className="text-center p-4 rounded-xl bg-red-500/10 border border-red-500/20">
-                  <p className="text-3xl font-bold text-red-400">{overview.issueBreakdown.worsened}</p>
-                  <p className="text-sm text-text-secondary mt-1">Worsened</p>
+                <div className="text-center p-2 md:p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+                  <p className="text-xl md:text-3xl font-bold text-red-400">{overview.issueBreakdown.worsened}</p>
+                  <p className="text-xs md:text-sm text-text-secondary mt-1">Worsened</p>
                 </div>
-                <div className="text-center p-4 rounded-xl bg-gray-500/10 border border-gray-500/20">
-                  <p className="text-3xl font-bold text-gray-400">{overview.issueBreakdown.unchanged}</p>
-                  <p className="text-sm text-text-secondary mt-1">Unchanged</p>
+                <div className="text-center p-2 md:p-4 rounded-xl bg-gray-500/10 border border-gray-500/20">
+                  <p className="text-xl md:text-3xl font-bold text-gray-400">{overview.issueBreakdown.unchanged}</p>
+                  <p className="text-xs md:text-sm text-text-secondary mt-1">Unchanged</p>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
             {/* Left Column: Issue Trend + Top Issues */}
             <div className="space-y-8">
               {/* Issue Trend */}
-              <div className="glass-card p-6">
-                <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-accent">trending_up</span>
-                  Last 7 Days Issue Trend
+              <div className="glass-card p-4 md:p-6">
+                <h2 className="text-base md:text-lg font-semibold text-text-primary mb-3 md:mb-4 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-accent text-lg md:text-xl">trending_up</span>
+                  <span className="hidden sm:inline">Last 7 Days Issue Trend</span>
+                  <span className="sm:hidden">7-Day Trend</span>
                 </h2>
                 {trends.length > 0 ? (
                   <div className="flex items-end gap-2 h-40">
@@ -232,10 +233,11 @@ export default function Dashboard() {
               </div>
 
               {/* Top Issues */}
-              <div className="glass-card p-6">
-                <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-orange-400">priority_high</span>
-                  Most Common Issues
+              <div className="glass-card p-4 md:p-6">
+                <h2 className="text-base md:text-lg font-semibold text-text-primary mb-3 md:mb-4 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-orange-400 text-lg md:text-xl">priority_high</span>
+                  <span className="hidden sm:inline">Most Common Issues</span>
+                  <span className="sm:hidden">Top Issues</span>
                 </h2>
                 {topIssues.length > 0 ? (
                   <div className="space-y-3">
@@ -270,9 +272,9 @@ export default function Dashboard() {
             </div>
 
             {/* Right Column: Recent Activity */}
-            <div className="glass-card p-6">
-              <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-blue-400">schedule</span>
+            <div className="glass-card p-4 md:p-6">
+              <h2 className="text-base md:text-lg font-semibold text-text-primary mb-3 md:mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-blue-400 text-lg md:text-xl">schedule</span>
                 Recent Activity
               </h2>
               {activities.length > 0 ? (
@@ -356,12 +358,12 @@ function StatCard({
   };
 
   return (
-    <div className={`glass-card p-5 border ${colorClasses[color]} hover:scale-105 transition-transform`}>
-      <div className="flex items-center gap-3 mb-2">
-        <span className={`material-symbols-outlined ${iconColors[color]}`}>{icon}</span>
-        <span className="text-sm text-text-secondary">{label}</span>
+    <div className={`glass-card p-3 md:p-5 border ${colorClasses[color]} hover:scale-105 transition-transform`}>
+      <div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
+        <span className={`material-symbols-outlined text-lg md:text-xl ${iconColors[color]}`}>{icon}</span>
+        <span className="text-xs md:text-sm text-text-secondary truncate">{label}</span>
       </div>
-      <p className="text-3xl font-bold text-text-primary">{value}</p>
+      <p className="text-xl md:text-3xl font-bold text-text-primary">{value}</p>
     </div>
   );
 }
