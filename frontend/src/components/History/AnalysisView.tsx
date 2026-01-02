@@ -93,42 +93,42 @@ export default function AnalysisView({ versionId, onBack }: AnalysisViewProps) {
                         Detected Issues ({selectedVersion.analysis.issues.length})
                     </h3>
 
-                    <div className="grid gap-6">
+                    <div className="grid gap-4 sm:gap-6">
                         {selectedVersion.analysis.issues.map((issue, idx) => (
-                            <div key={idx} className="glass p-6 rounded-2xl border border-white/5 hover:border-white/10 transition-all group">
-                                <div className="flex flex-wrap justify-between items-start mb-4 gap-4">
-                                    <div>
-                                        <div className="flex items-center gap-3 mb-1">
-                                            <span className="font-mono text-base font-bold text-red-400 bg-red-500/10 px-2 py-1 rounded border border-red-500/10">{issue.issueCode}</span>
+                            <div key={idx} className="glass p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-white/5 hover:border-white/10 transition-all group">
+                                <div className="flex flex-col sm:flex-row sm:flex-wrap justify-between items-start gap-3 sm:gap-4 mb-4">
+                                    <div className="w-full sm:w-auto">
+                                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1">
+                                            <span className="font-mono text-sm sm:text-base font-bold text-red-400 bg-red-500/10 px-2 py-1 rounded border border-red-500/10 break-all max-w-full">{issue.issueCode}</span>
                                         </div>
-                                        <div className="text-sm text-text-secondary mt-2">
+                                        <div className="text-xs sm:text-sm text-text-secondary mt-2">
                                             Complexity: <span className="text-text-primary font-mono bg-bg-tertiary/50 px-1.5 py-0.5 rounded">{issue.complexity}</span>
                                         </div>
                                     </div>
-                                    <span className={`text-xs px-3 py-1.5 rounded-full uppercase font-bold tracking-wider border
+                                    <span className={`text-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-full uppercase font-bold tracking-wider border shrink-0
                                         ${issue.severity === 'high' ? 'bg-red-500/10 text-red-500 border-red-500/20 shadow-red-500/10 shadow-lg' :
                                             issue.severity === 'medium' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
                                                 'bg-blue-500/10 text-blue-500 border-blue-500/20'
                                         }`}>
-                                        {issue.severity} Severity
+                                        {issue.severity}
                                     </span>
                                 </div>
 
-                                <div className="grid md:grid-cols-2 gap-4 mt-6">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 mt-4 sm:mt-6">
                                     {(issue.snippet?.beforeSnippet || issue.beforeSnippet) && (
-                                        <div className="space-y-2">
+                                        <div className="space-y-2 min-w-0">
                                             <div className="text-xs font-semibold text-text-secondary uppercase tracking-wider pl-1">Target Code</div>
-                                            <div className="bg-[#0d1117] rounded-xl p-4 overflow-x-auto border border-red-500/20 shadow-inner">
-                                                <pre className="text-xs font-mono text-gray-300 leading-relaxed"><code>{issue.snippet?.beforeSnippet || issue.beforeSnippet}</code></pre>
+                                            <div className="bg-[#0d1117] rounded-lg sm:rounded-xl p-3 sm:p-4 overflow-x-auto border border-red-500/20 shadow-inner max-w-full">
+                                                <pre className="text-[10px] sm:text-xs font-mono text-gray-300 leading-relaxed whitespace-pre-wrap break-words sm:whitespace-pre sm:break-normal"><code>{issue.snippet?.beforeSnippet || issue.beforeSnippet}</code></pre>
                                             </div>
                                         </div>
                                     )}
 
                                     {(issue.snippet?.afterSnippet || issue.afterSnippet) && (
-                                        <div className="space-y-2">
+                                        <div className="space-y-2 min-w-0">
                                             <div className="text-xs font-semibold text-text-secondary uppercase tracking-wider pl-1 text-green-400">Suggested Fix</div>
-                                            <div className="bg-[#0d1117] rounded-xl p-4 overflow-x-auto border border-green-500/20 shadow-inner group-hover:shadow-green-500/5 transition-shadow">
-                                                <pre className="text-xs font-mono text-green-400 leading-relaxed"><code>{issue.snippet?.afterSnippet || issue.afterSnippet}</code></pre>
+                                            <div className="bg-[#0d1117] rounded-lg sm:rounded-xl p-3 sm:p-4 overflow-x-auto border border-green-500/20 shadow-inner group-hover:shadow-green-500/5 transition-shadow max-w-full">
+                                                <pre className="text-[10px] sm:text-xs font-mono text-green-400 leading-relaxed whitespace-pre-wrap break-words sm:whitespace-pre sm:break-normal"><code>{issue.snippet?.afterSnippet || issue.afterSnippet}</code></pre>
                                             </div>
                                         </div>
                                     )}
