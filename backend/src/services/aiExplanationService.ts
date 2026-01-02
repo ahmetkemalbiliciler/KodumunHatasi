@@ -1,5 +1,5 @@
 import prisma from "../utils/prisma.js";
-import type { ComparisonResult } from "@prisma/client";
+import type { ComparisonResult } from "../generated/prisma/client.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 

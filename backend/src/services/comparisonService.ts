@@ -1,6 +1,6 @@
 import prisma from "../utils/prisma.js";
 import type { ChangeType } from "../types/index.js";
-import type { Severity, Complexity, IssueCode, AnalysisIssue } from "@prisma/client";
+import type { Severity, Complexity, IssueCode, AnalysisIssue } from "../generated/prisma/client.js";
 
 // Severity ranking for comparison (lower = better)
 const SEVERITY_RANK: Record<Severity, number> = {
