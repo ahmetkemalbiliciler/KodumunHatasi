@@ -51,6 +51,10 @@ export const auth = {
         method: "POST",
         body: JSON.stringify(credentials),
     }),
+    forgotPassword: (data: { email: string }) => apiCall<any>("/auth/forgot-password", {
+        method: "POST",
+        body: JSON.stringify(data),
+    }),
     me: () => apiCall<any>("/auth/me"),
 };
 
