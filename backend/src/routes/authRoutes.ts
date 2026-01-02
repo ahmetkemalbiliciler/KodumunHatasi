@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { signUp, login, getMe } from "../controllers/authController.js";
+import { signUp, login, getMe, forgotPassword, resetPassword } from "../controllers/authController.js";
 
 const router = Router();
 
@@ -11,5 +11,11 @@ router.post("/login", login);
 
 // GET /api/auth/me - Get current user (requires token)
 router.get("/me", getMe);
+
+// POST /api/auth/forgot-password - Request password reset email
+router.post("/forgot-password", forgotPassword);
+
+// POST /api/auth/reset-password - Reset password with token
+router.post("/reset-password", resetPassword);
 
 export default router;

@@ -143,3 +143,100 @@ export async function getMe(req: Request, res: Response): Promise<void> {
     res.status(500).json({ success: false, error: "Failed to get user info" });
   }
 }
+
+interface ForgotPasswordBody {
+  email: string;
+}
+
+/**
+ * Request password reset email
+ * POST /auth/forgot-password
+ */
+export async function forgotPassword(req: Request, res: Response): Promise<void> {
+  try {
+    const { email } = req.body as ForgotPasswordBody;
+
+    if (!email) {
+      res.status(400).json({ success: false, error: "Email is required" });
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password`,
+    });
+
+    if (error) {
+      res.status(400).json({ success: false, error: error.message });
+      return;
+    }
+
+    res.json({
+      success: true,
+      data: {
+        message: "Password reset email sent. Please check your inbox.",
+      },
+    });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({ success: false, error: "Failed to send reset email" });
+  }
+}
+
+interface ResetPasswordBody {
+  newPassword: string;
+}
+
+/**
+ * Reset password with new password (user must be authenticated via reset token)
+ * POST /auth/reset-password
+ */
+export async function resetPassword(req: Request, res: Response): Promise<void> {
+  try {
+    const { newPassword } = req.body as ResetPasswordBody;
+
+    if (!newPassword) {
+      res.status(400).json({ success: false, error: "New password is required" });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      res.status(400).json({ success: false, error: "Password must be at least 6 characters" });
+      return;
+    }
+
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      res.status(401).json({ success: false, error: "No token provided" });
+      return;
+    }
+
+    const token = authHeader.substring(7);
+
+    // First verify the token
+    const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+    if (userError || !userData.user) {
+      res.status(401).json({ success: false, error: "Invalid or expired token" });
+      return;
+    }
+
+    // Update the password
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      res.status(400).json({ success: false, error: error.message });
+      return;
+    }
+
+    res.json({
+      success: true,
+      data: {
+        message: "Password updated successfully",
+      },
+    });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({ success: false, error: "Failed to reset password" });
+  }
+}
