@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { supabase } from "../utils/supabase.js";
+import { supabase, supabaseAdmin } from "../utils/supabase.js";
 import prisma from "../utils/prisma.js";
 
 interface SignUpBody {
@@ -213,7 +213,7 @@ export async function resetPassword(req: Request, res: Response): Promise<void> 
 
     const token = authHeader.substring(7);
 
-    // First verify the token
+    // First verify the token and get user
     const { data: userData, error: userError } = await supabase.auth.getUser(token);
 
     if (userError || !userData.user) {
@@ -221,8 +221,20 @@ export async function resetPassword(req: Request, res: Response): Promise<void> 
       return;
     }
 
-    // Update the password
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    // Check if admin client is available
+    if (!supabaseAdmin) {
+      res.status(500).json({ 
+        success: false, 
+        error: "Password reset not configured. Missing SUPABASE_SERVICE_ROLE_KEY." 
+      });
+      return;
+    }
+
+    // Update the password using admin client
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(
+      userData.user.id,
+      { password: newPassword }
+    );
 
     if (error) {
       res.status(400).json({ success: false, error: error.message });
